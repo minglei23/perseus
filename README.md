@@ -23,6 +23,12 @@ compile the program for Linux:
 ```
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 ```
+start the server for Linux:
+```
+sudo lsof -i :8080
+kill [PID]
+nohup ./perseus/Perseus > perseus.log 2>&1 &
+```
 
 ## What API do we have?
 

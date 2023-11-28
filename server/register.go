@@ -60,6 +60,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func respondWithCode(w http.ResponseWriter, code int) {
+	store.SetCORS(&w)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(RegisterResponse{Code: code})
 }
