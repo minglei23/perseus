@@ -23,14 +23,14 @@ func init() {
 
 // LOGIN API
 
-func GetUserIdByEmailAndPassword(email, password string) (id int64, err error) {
-	query := "SELECT id FROM user_info WHERE email = ? AND password = ?"
-	err = db.QueryRow(query, email, password).Scan(&id)
+func GetUserIdByEmailAndPassword(email, password string) (id int64, activated, vip bool, err error) {
+	query := "SELECT id, activated, vip FROM user_info WHERE email = ? AND password = ?"
+	err = db.QueryRow(query, email, password).Scan(&id, &activated, &vip)
 	if err == sql.ErrNoRows {
 		// email or password is not correct
-		return -1, nil
+		return -1, false, false, nil
 	}
-	return id, err
+	return id, activated, vip, err
 }
 
 // REGISTER API

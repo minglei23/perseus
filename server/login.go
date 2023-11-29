@@ -14,7 +14,10 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	ID int64
+	ID        int64
+	Email     string
+	Activated bool
+	VIP       bool
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +28,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := store.GetUserIdByEmailAndPassword(loginRequest.Email, loginRequest.Password)
+	id, activated, vip, err := store.GetUserIdByEmailAndPassword(loginRequest.Email, loginRequest.Password)
 	if err != nil || id == -1 {
 		log.Println("Login: authentication failed:", err)
 		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
@@ -42,5 +45,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	store.SetCORS(&w)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(LoginResponse{ID: id})
+	json.NewEncoder(w).Encode(LoginResponse{ID: id, Email: loginRequest.Email, Activated: activated, VIP: vip})
 }
