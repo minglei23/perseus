@@ -4,35 +4,56 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
 func CreateCookie(id string) (http.Cookie, error) {
 	expires := time.Now().Add(24 * time.Hour)
-	value, err := getHashValue(id, expires)
+	hashValue, err := getHashValue(id, fmt.Sprintf("%v", expires.Unix()))
 	if err != nil {
 		return http.Cookie{}, err
 	}
 	return http.Cookie{
 		Name:     "perseus",
-		Value:    value,
+		Value:    fmt.Sprintf("%s|%v|%s", id, expires.Unix(), hashValue),
 		Expires:  expires,
 		HttpOnly: true,
-		// // HTTPS ONLY
-		// Secure: true,
+		// Secure: true, // Uncomment this when using HTTPS
 	}, nil
 }
 
-func CheckCookie(id string, cookie http.Cookie) (bool, error) {
-	expectedValue, err := getHashValue(id, cookie.Expires)
+func CheckCookie(cookie http.Cookie) (bool, error) {
+	parts := strings.Split(cookie.Value, "|")
+	if len(parts) != 3 {
+		return false, fmt.Errorf("invalid cookie format")
+	}
+
+	id, expiresPart, hashValue := parts[0], parts[1], parts[2]
+	if id == "" || expiresPart == "" || hashValue == "" {
+		return false, fmt.Errorf("missing cookie components")
+	}
+
+	expiresUnix, err := strconv.ParseInt(expiresPart, 10, 64)
+	if err != nil {
+		return false, fmt.Errorf("invalid expiration time")
+	}
+
+	if time.Now().After(time.Unix(expiresUnix, 0)) {
+		return false, fmt.Errorf("cookie expired")
+	}
+
+	expectedValue, err := getHashValue(id, expiresPart)
 	if err != nil {
 		return false, err
 	}
-	return cookie.Value == expectedValue, nil
+
+	return hashValue == expectedValue, nil
 }
 
-func getHashValue(name string, expires time.Time) (string, error) {
-	input := fmt.Sprintf("%s-%v-Perseus_2023", name, expires.Unix())
+func getHashValue(name, expires string) (string, error) {
+	input := name + expires + "Perseus_1110"
 	hasher := sha256.New()
 	_, err := hasher.Write([]byte(input))
 	if err != nil {
@@ -43,8 +64,8 @@ func getHashValue(name string, expires time.Time) (string, error) {
 	return hashString, nil
 }
 
-func GetHashValue(name string, expires time.Time) (string, error) {
-	input := fmt.Sprintf("%s-%v-Perseus_1110", name, expires.Unix())
+func GetHashValue(name, expires string) (string, error) {
+	input := name + expires + "Perseus_2023"
 	hasher := sha256.New()
 	_, err := hasher.Write([]byte(input))
 	if err != nil {

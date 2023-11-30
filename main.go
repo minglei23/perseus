@@ -15,6 +15,10 @@ func main() {
 	http.HandleFunc("/verify-email", server.VerifyEmail)
 	http.HandleFunc("/verify", server.Verify)
 
+	http.HandleFunc("/video-list", server.VideoList)
+	http.HandleFunc("/user-video", server.UserVideo)
+	http.HandleFunc("/user-video-list", server.UserVideoList)
+
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

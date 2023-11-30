@@ -14,7 +14,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	ID        int64
+	ID        int
 	Email     string
 	Activated bool
 	VIP       bool
@@ -35,7 +35,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := store.CreateCookie(strconv.FormatInt(id, 10))
+	cookie, err := store.CreateCookie(strconv.Itoa(id))
 	if err != nil {
 		log.Println("Login: create cookie error:", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)

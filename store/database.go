@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,9 +22,79 @@ func init() {
 	db.SetMaxIdleConns(5)
 }
 
+type Video struct {
+	ID          int
+	Name        string
+	Type        int
+	TotalNumber int
+	BaseURL     string
+}
+
+// VIDEO API
+
+func buildVideoList(rows *sql.Rows) ([]Video, error) {
+	defer rows.Close()
+	var videos []Video
+	for rows.Next() {
+		var v Video
+		if err := rows.Scan(&v.ID, &v.Name, &v.Type, &v.TotalNumber, &v.BaseURL); err != nil {
+			return nil, err
+		}
+		videos = append(videos, v)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return videos, nil
+
+}
+
+func GetVideoList() ([]Video, error) {
+	rows, err := db.Query("SELECT id, name, type, total_number, base_url FROM video_info")
+	if err != nil {
+		return nil, err
+	}
+	return buildVideoList(rows)
+}
+
+func GetUserLike(userId int) ([]Video, error) {
+	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ?", userId)
+	if err != nil {
+		return nil, err
+	}
+	return buildVideoList(rows)
+}
+
+func GetUserHistoryLstMonth(userId int) ([]Video, error) {
+	after := time.Now().AddDate(0, -1, 0)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ?", userId, after)
+	if err != nil {
+		return nil, err
+	}
+	return buildVideoList(rows)
+}
+
+func InsertUserLike(userId int, videoId int) error {
+	_, err := db.Exec("DELETE FROM user_like WHERE user_id = ? AND video_id = ?", userId, videoId)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO user_like (user_id, video_id) VALUES (?, ?)", userId, videoId)
+	return err
+}
+
+func InsertUserHistory(userId int, videoId int) error {
+	_, err := db.Exec("DELETE FROM user_history WHERE user_id = ? AND video_id = ?", userId, videoId)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO user_history (user_id, video_id) VALUES (?, ?)", userId, videoId)
+	return err
+}
+
 // LOGIN API
 
-func GetUserIdByEmailAndPassword(email, password string) (id int64, activated, vip bool, err error) {
+func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip bool, err error) {
 	query := "SELECT id, activated, vip FROM user_info WHERE email = ? AND password = ?"
 	err = db.QueryRow(query, email, password).Scan(&id, &activated, &vip)
 	if err == sql.ErrNoRows {
@@ -45,18 +116,22 @@ func EmailExist(email string) (bool, error) {
 	return true, err
 }
 
-func InsertUser(password, email string) (id int64, err error) {
+func InsertUser(password, email string) (id int, err error) {
 	query := "INSERT INTO user_info (password, email, activated, vip) values (?, ?, FALSE, FALSE)"
 	result, err := db.Exec(query, password, email)
 	if err != nil {
 		return id, err
 	}
-	return result.LastInsertId()
+	ID, err := result.LastInsertId()
+	if err != nil {
+		return id, err
+	}
+	return int(ID), nil
 }
 
 // RESET API
 
-func GetUserIdByEmail(email string) (id int64, err error) {
+func GetUserIdByEmail(email string) (id int, err error) {
 	query := "SELECT id FROM user_info WHERE email = ?"
 	err = db.QueryRow(query, email).Scan(&id)
 	if err == sql.ErrNoRows {
