@@ -14,6 +14,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
+	Token     string
 	ID        int
 	Email     string
 	Activated bool
@@ -35,15 +36,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := store.CreateCookie(strconv.Itoa(id))
-	if err != nil {
-		log.Println("Login: create cookie error:", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-	http.SetCookie(w, &cookie)
-
+	token := store.CreateToken(strconv.Itoa(id))
 	store.SetCORS(&w)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(LoginResponse{ID: id, Email: loginRequest.Email, Activated: activated, VIP: vip})
+	json.NewEncoder(w).Encode(LoginResponse{Token: token, ID: id, Email: loginRequest.Email, Activated: activated, VIP: vip})
 }

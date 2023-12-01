@@ -35,11 +35,11 @@ nohup ./perseus/Perseus > perseus.log 2>&1 &
 
 ### Login API
 `/login`  
-Authenticate users and set cookies.
+Authenticate users and set token.
 
 ### Register API
 `/register`  
-User register and set cookies.  
+User register and set token.  
 
 ### Reset API
 `/reset-email`  

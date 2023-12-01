@@ -16,8 +16,8 @@ type RegisterRequest struct {
 type RegisterResponse struct {
 	// Code = 1: register successfully
 	// Code = 2: email is existing in database
-	// Code = 3: register successfully, but login failed
 	Code      int
+	Token     string
 	ID        int
 	Email     string
 	Activated bool
@@ -52,19 +52,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create cookie
-	cookie, err := store.CreateCookie(strconv.Itoa(id))
-	if err != nil {
-		respondWithCode(w, 3, id, registerRequest.Email)
-		return
-	}
-
-	http.SetCookie(w, &cookie)
 	respondWithCode(w, 1, id, registerRequest.Email)
 }
 
 func respondWithCode(w http.ResponseWriter, code int, id int, email string) {
+	token := store.CreateToken(strconv.Itoa(id))
 	store.SetCORS(&w)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(RegisterResponse{Code: code, ID: id, Email: email, Activated: false, VIP: false})
+	json.NewEncoder(w).Encode(RegisterResponse{Code: code, Token: token, ID: id, Email: email, Activated: false, VIP: false})
 }
