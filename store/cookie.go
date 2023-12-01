@@ -16,10 +16,10 @@ func CreateCookie(id string) (http.Cookie, error) {
 		return http.Cookie{}, err
 	}
 	return http.Cookie{
-		Name:    "perseus",
-		Value:   fmt.Sprintf("%s|%v|%s", id, expires.Unix(), hashValue),
-		Expires: expires,
-		// HttpOnly: true,
+		Name:     "perseus",
+		Value:    fmt.Sprintf("%s|%v|%s", id, expires.Unix(), hashValue),
+		Expires:  expires,
+		HttpOnly: false,
 		// Secure: true, // Uncomment this when using HTTPS
 	}, nil
 }
