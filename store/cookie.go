@@ -19,7 +19,7 @@ func CreateCookie(id string) (http.Cookie, error) {
 		Name:     "perseus",
 		Value:    fmt.Sprintf("%s|%v|%s", id, expires.Unix(), hashValue),
 		Expires:  expires,
-		HttpOnly: false,
+		HttpOnly: true,
 		// Secure: true, // Uncomment this when using HTTPS
 	}, nil
 }
