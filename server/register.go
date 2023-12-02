@@ -25,34 +25,32 @@ type RegisterResponse struct {
 }
 
 func Register(w http.ResponseWriter, r *http.Request) {
-	var registerRequest RegisterRequest
-	if err := json.NewDecoder(r.Body).Decode(&registerRequest); err != nil {
+	var request RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Println("Register: json decoder error:", err)
 		http.Error(w, "Invalid request format", http.StatusBadRequest)
 		return
 	}
 
-	// Check if email exists
-	emailExists, err := store.EmailExist(registerRequest.Email)
+	emailExists, err := store.EmailExist(request.Email)
 	if err != nil {
 		log.Println("Register: email exist error:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if emailExists {
-		respondWithCode(w, 2, -1, registerRequest.Email)
+		respondWithCode(w, 2, -1, request.Email)
 		return
 	}
 
-	// Inser user
-	id, err := store.InsertUser(registerRequest.Password, registerRequest.Email)
+	id, err := store.InsertUser(request.Password, request.Email)
 	if err != nil {
 		log.Println("Register: insert user error:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	respondWithCode(w, 1, id, registerRequest.Email)
+	respondWithCode(w, 1, id, request.Email)
 }
 
 func respondWithCode(w http.ResponseWriter, code int, id int, email string) {

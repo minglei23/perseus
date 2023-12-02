@@ -22,76 +22,6 @@ func init() {
 	db.SetMaxIdleConns(5)
 }
 
-type Video struct {
-	ID          int
-	Name        string
-	Type        int
-	TotalNumber int
-	BaseURL     string
-}
-
-// VIDEO API
-
-func buildVideoList(rows *sql.Rows) ([]Video, error) {
-	defer rows.Close()
-	var videos []Video
-	for rows.Next() {
-		var v Video
-		if err := rows.Scan(&v.ID, &v.Name, &v.Type, &v.TotalNumber, &v.BaseURL); err != nil {
-			return nil, err
-		}
-		videos = append(videos, v)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return videos, nil
-
-}
-
-func GetVideoList() ([]Video, error) {
-	rows, err := db.Query("SELECT id, name, type, total_number, base_url FROM video_info")
-	if err != nil {
-		return nil, err
-	}
-	return buildVideoList(rows)
-}
-
-func GetUserLike(userId int) ([]Video, error) {
-	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ?", userId)
-	if err != nil {
-		return nil, err
-	}
-	return buildVideoList(rows)
-}
-
-func GetUserHistoryLstMonth(userId int) ([]Video, error) {
-	after := time.Now().AddDate(0, -1, 0)
-	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ?", userId, after)
-	if err != nil {
-		return nil, err
-	}
-	return buildVideoList(rows)
-}
-
-func InsertUserLike(userId int, videoId int) error {
-	_, err := db.Exec("DELETE FROM user_like WHERE user_id = ? AND video_id = ?", userId, videoId)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("INSERT INTO user_like (user_id, video_id) VALUES (?, ?)", userId, videoId)
-	return err
-}
-
-func InsertUserHistory(userId int, videoId int) error {
-	_, err := db.Exec("DELETE FROM user_history WHERE user_id = ? AND video_id = ?", userId, videoId)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("INSERT INTO user_history (user_id, video_id) VALUES (?, ?)", userId, videoId)
-	return err
-}
-
 // LOGIN API
 
 func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip bool, err error) {
@@ -152,5 +82,98 @@ func UpdateUserPassword(id, password string) error {
 func ActivateUser(id string) error {
 	query := "UPDATE user_info SET activated = TRUE WHERE id = ?"
 	_, err := db.Exec(query, id)
+	return err
+}
+
+// VIDEO API
+
+type Video struct {
+	ID          int
+	Name        string
+	Type        int
+	TotalNumber int
+	BaseURL     string
+}
+
+type History struct {
+	ID          int
+	Name        string
+	Episode     int
+	TotalNumber int
+	BaseURL     string
+}
+
+func buildVideoList(rows *sql.Rows) ([]Video, error) {
+	defer rows.Close()
+	var videos []Video
+	for rows.Next() {
+		var v Video
+		if err := rows.Scan(&v.ID, &v.Name, &v.Type, &v.TotalNumber, &v.BaseURL); err != nil {
+			return nil, err
+		}
+		videos = append(videos, v)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return videos, nil
+}
+
+func buildHostoryList(rows *sql.Rows) ([]History, error) {
+	defer rows.Close()
+	var histories []History
+	for rows.Next() {
+		var v History
+		if err := rows.Scan(&v.ID, &v.Name, &v.Episode, &v.TotalNumber, &v.BaseURL); err != nil {
+			return nil, err
+		}
+		histories = append(histories, v)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return histories, nil
+}
+
+func GetVideoList() ([]Video, error) {
+	rows, err := db.Query("SELECT id, name, type, total_number, base_url FROM video_info")
+	if err != nil {
+		return nil, err
+	}
+	return buildVideoList(rows)
+}
+
+func GetUserLike(userId int) ([]Video, error) {
+	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ?", userId)
+	if err != nil {
+		return nil, err
+	}
+	return buildVideoList(rows)
+}
+
+func GetUserHistoryLstMonth(userId int) ([]History, error) {
+	after := time.Now().AddDate(0, -1, 0)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, user_history.episode, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ?", userId, after)
+	if err != nil {
+		return nil, err
+	}
+	return buildHostoryList(rows)
+}
+
+func InsertUserLike(userId int, videoId int) error {
+	_, err := db.Exec("DELETE FROM user_like WHERE user_id = ? AND video_id = ?", userId, videoId)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO user_like (user_id, video_id) VALUES (?, ?)", userId, videoId)
+	return err
+}
+
+func InsertUserHistory(userId int, videoId int, episode int) error {
+	_, err := db.Exec("DELETE FROM user_history WHERE user_id = ? AND video_id = ?", userId, videoId)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO user_history (user_id, video_id, episode) VALUES (?, ?, ?)", userId, videoId, episode)
 	return err
 }

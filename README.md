@@ -56,10 +56,18 @@ Veryify user email.
 ### Video API
 `/video-list`  
 Get video list.  
-`/user-video`  
-Record the video that user liked/watched.  
-`/user-video-list`  
-Get video list that user liked/watched.  
+
+### Favorites API
+`/record-favorites`  
+Record user's favorites.  
+`/favorites`  
+Get user's favorites list.  
+
+### History API
+`/record-history`  
+Record user's history.  
+`/history`  
+Get user's history list.  
 
 ## What tables are in the database?
 
@@ -90,6 +98,7 @@ base_url VARCHAR(255) NOT NULL
 CREATE TABLE user_history (
 user_id INT UNSIGNED NOT NULL,
 video_id INT UNSIGNED NOT NULL,
+episode INT UNSIGNED NOT NULL,
 watch_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY (user_id) REFERENCES user_info(id),
 FOREIGN KEY (video_id) REFERENCES video_info(id)
