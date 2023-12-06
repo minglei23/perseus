@@ -56,3 +56,23 @@ host = 'http://127.0.0.1:8080'
 
 # r = requests.post(favorites_url, json=favorites_data)
 # print(r.text)
+
+# Points API
+
+# points_url = host + '/points'
+# points_data = {
+#     'Token':'1|1701910411|894979dbbebc3eeb86c7b21e799fd40d',
+#     'UserID':1,
+# }
+
+# r = requests.post(points_url, json=points_data)
+# print(r.text)
+
+# checkin_url = host + '/checkin'
+# checkin_data = {
+#     'Token':'1|1701910411|894979dbbebc3eeb86c7b21e799fd40d',
+#     'UserID':1,
+# }
+
+# r = requests.post(checkin_url, json=checkin_data)
+# print(r.text)

@@ -69,6 +69,14 @@ Record user's history.
 `/history`  
 Get user's history list.  
 
+### Points API
+`/points`  
+Get user's points.  
+`/already-checkin`  
+Check if already checked in today.  
+`/checkin`  
+Check in and add points.  
+
 ## What tables are in the database?
 
 `user_info`
@@ -78,7 +86,8 @@ id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 password VARCHAR(255) NOT NULL,
 email VARCHAR(255) NOT NULL,
 activated BOOLEAN,
-vip BOOLEAN
+vip BOOLEAN,
+points INT UNSIGNED NOT NULL
 );
 ```
 
@@ -113,6 +122,17 @@ video_id INT UNSIGNED NOT NULL,
 PRIMARY KEY (user_id, video_id),
 FOREIGN KEY (user_id) REFERENCES user_info(id),
 FOREIGN KEY (video_id) REFERENCES video_info(id)
+);
+```
+
+`activities`
+```
+CREATE TABLE activities (
+user_id INT UNSIGNED NOT NULL,
+type INT UNSIGNED NOT NULL,
+points INT UNSIGNED NOT NULL,
+time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (user_id) REFERENCES user_info(id)
 );
 ```
 

@@ -25,6 +25,10 @@ func main() {
 	http.HandleFunc("/record-history", server.RecordHistory)
 	http.HandleFunc("/history", server.History)
 
+	http.HandleFunc("/points", server.Points)
+	http.HandleFunc("/already-checkin", server.AlreadyCheckin)
+	http.HandleFunc("/checkin", server.Checkin)
+
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

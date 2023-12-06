@@ -22,6 +22,36 @@ func init() {
 	db.SetMaxIdleConns(5)
 }
 
+// POINTS API
+
+func GetPoints(id int) (points int, err error) {
+	query := "SELECT points FROM user_info WHERE id = ?"
+	err = db.QueryRow(query, id).Scan(&points)
+	return points, err
+}
+
+func GetIfUserCheckedToday(id int) (checked bool, err error) {
+	var count int
+	query := "SELECT COUNT(*) FROM activities WHERE user_id = ? AND type = 1 AND DATE(time) = CURDATE()"
+	err = db.QueryRow(query, id).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func InsertActivities(id int, activity int, points int) error {
+	query := "INSERT INTO activities (user_id, type, points) VALUES (?, ?, ?)"
+	_, err := db.Exec(query, id, activity, points)
+	return err
+}
+
+func UpdateUserPoints(id int, points int) error {
+	query := "UPDATE user_info SET points = ? WHERE id = ?"
+	_, err := db.Exec(query, points, id)
+	return err
+}
+
 // LOGIN API
 
 func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip bool, err error) {
@@ -47,7 +77,7 @@ func EmailExist(email string) (bool, error) {
 }
 
 func InsertUser(password, email string) (id int, err error) {
-	query := "INSERT INTO user_info (password, email, activated, vip) values (?, ?, FALSE, FALSE)"
+	query := "INSERT INTO user_info (password, email, activated, vip, points) values (?, ?, FALSE, FALSE, 0)"
 	result, err := db.Exec(query, password, email)
 	if err != nil {
 		return id, err
