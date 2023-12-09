@@ -1,6 +1,8 @@
 package store
 
 const (
+	Admin = "testtesttest"
+
 	MysqlAddress  = "database-video.cqeq6ojntllu.us-east-2.rds.amazonaws.com"
 	MysqlPort     = "3306"
 	MysqlUser     = "perseus"

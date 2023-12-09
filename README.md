@@ -77,6 +77,10 @@ Check if already checked in today.
 `/checkin`  
 Check in and add points.  
 
+### Admin API
+`/upload-video-info`  
+Upload video info for admin.  
+
 ## What tables are in the database?
 
 `user_info`

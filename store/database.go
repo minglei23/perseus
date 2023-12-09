@@ -52,6 +52,21 @@ func UpdateUserPoints(id int, points int) error {
 	return err
 }
 
+// ADMIN API
+
+func InsertVideo(name string, videoType int, totalNumber int, baseUrl string) (id int, err error) {
+	query := "INSERT INTO video_info (name, type, total_number, base_url) values (?, ?, ?, ?)"
+	result, err := db.Exec(query, name, videoType, totalNumber, baseUrl)
+	if err != nil {
+		return id, err
+	}
+	ID, err := result.LastInsertId()
+	if err != nil {
+		return id, err
+	}
+	return int(ID), nil
+}
+
 // LOGIN API
 
 func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip bool, err error) {

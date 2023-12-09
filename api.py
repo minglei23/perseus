@@ -76,3 +76,22 @@ host = 'http://127.0.0.1:8080'
 
 # r = requests.post(checkin_url, json=checkin_data)
 # print(r.text)
+
+# Admin API
+
+# upload_url = host + '/upload-video-info'
+# upload_data = {
+#     'Admin':'testtesttest',
+#     'Name':'CEO 2',
+#     'Type':2,
+#     'TotalNumber':2,
+#     'BaseUrl':'https://dc4ef1i295q51.cloudfront.net/test5',
+# }
+
+# r = requests.post(upload_url, json=upload_data)
+# print(r.text)
+
+# video_url = host + '/video-list'
+
+# r = requests.get(video_url)
+# print(r.text)
