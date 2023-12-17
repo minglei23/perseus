@@ -28,7 +28,7 @@ host = 'http://127.0.0.1:8080'
 
 # history_url = host + '/history'
 # history_data = {
-#     'Token':'1|1701630097|27369556dc2fe3428a6372d41787589a',
+#     'Token':'1|1702855882|d5392ff4ac3bc2d45ba950b9e15c0f3c',
 #     'UserID':1,
 # }
 
@@ -40,17 +40,27 @@ host = 'http://127.0.0.1:8080'
 
 # record_favorites_url = host + '/record-favorites'
 # record_favorites_data = {
-#     'Token':'1|1701630097|27369556dc2fe3428a6372d41787589a',
+#     'Token':'1|1702855882|d5392ff4ac3bc2d45ba950b9e15c0f3c',
 #     'UserID':1,
-#     'VideoID':2,
+#     'VideoID':5,
 # }
 
 # r = requests.post(record_favorites_url, json=record_favorites_data)
 # print(r.text)
 
+# remove_favorites_url = host + '/remove-favorites'
+# remove_favorites_data = {
+#     'Token':'1|1702855882|d5392ff4ac3bc2d45ba950b9e15c0f3c',
+#     'UserID':1,
+#     'VideoID':5,
+# }
+
+# r = requests.post(remove_favorites_url, json=remove_favorites_data)
+# print(r.text)
+
 # favorites_url = host + '/favorites'
 # favorites_data = {
-#     'Token':'1|1701630097|27369556dc2fe3428a6372d41787589a',
+#     'Token':'1|1702855882|d5392ff4ac3bc2d45ba950b9e15c0f3c',
 #     'UserID':1,
 # }
 

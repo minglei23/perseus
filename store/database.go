@@ -189,7 +189,7 @@ func GetVideoList() ([]Video, error) {
 }
 
 func GetUserLike(userId int) ([]Video, error) {
-	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ?", userId)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ? ORDER BY user_like.watch_time DESC", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func GetUserLike(userId int) ([]Video, error) {
 
 func GetUserHistoryLstMonth(userId int) ([]History, error) {
 	after := time.Now().AddDate(0, -1, 0)
-	rows, err := db.Query("SELECT video_info.id, video_info.name, user_history.episode, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ?", userId, after)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, user_history.episode, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ? ORDER BY user_history.watch_time DESC", userId, after)
 	if err != nil {
 		return nil, err
 	}
@@ -211,6 +211,11 @@ func InsertUserLike(userId int, videoId int) error {
 		return err
 	}
 	_, err = db.Exec("INSERT INTO user_like (user_id, video_id) VALUES (?, ?)", userId, videoId)
+	return err
+}
+
+func DeleteUserLike(userId int, videoId int) error {
+	_, err := db.Exec("DELETE FROM user_like WHERE user_id = ? AND video_id = ?", userId, videoId)
 	return err
 }
 

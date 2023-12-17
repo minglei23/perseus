@@ -20,6 +20,7 @@ func main() {
 	http.HandleFunc("/video-list", server.VideoList)
 
 	http.HandleFunc("/record-favorites", server.RecordFavorites)
+	http.HandleFunc("/remove-favorites", server.RemoveFavorites)
 	http.HandleFunc("/favorites", server.Favorites)
 
 	http.HandleFunc("/record-history", server.RecordHistory)

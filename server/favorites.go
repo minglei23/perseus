@@ -45,6 +45,34 @@ func RecordFavorites(w http.ResponseWriter, r *http.Request) {
 	}{Status: "Success"})
 }
 
+func RemoveFavorites(w http.ResponseWriter, r *http.Request) {
+	var request FavoritesRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		log.Println("RemoveFavorites: json decoder error:", err)
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
+	}
+	if !store.CheckToken(request.Token) {
+		log.Println("RemoveFavorites: check token failed:")
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
+	}
+
+	err = store.DeleteUserLike(request.UserID, request.VideoID)
+	if err != nil {
+		log.Println("RemoveFavorites:", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	store.SetCORS(&w)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(struct {
+		Status string `json:"status"`
+	}{Status: "Success"})
+}
+
 func Favorites(w http.ResponseWriter, r *http.Request) {
 	var request FavoritesRequest
 	err := json.NewDecoder(r.Body).Decode(&request)

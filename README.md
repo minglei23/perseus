@@ -58,6 +58,8 @@ Veryify user email.
 Get video list.  
 
 ### Favorites API
+`/remove-favorites`  
+Remove user's favorites.  
 `/record-favorites`  
 Record user's favorites.  
 `/favorites`  
@@ -123,7 +125,7 @@ FOREIGN KEY (video_id) REFERENCES video_info(id)
 CREATE TABLE user_like (
 user_id INT UNSIGNED NOT NULL,
 video_id INT UNSIGNED NOT NULL,
-PRIMARY KEY (user_id, video_id),
+watch_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY (user_id) REFERENCES user_info(id),
 FOREIGN KEY (video_id) REFERENCES video_info(id)
 );
