@@ -4,9 +4,15 @@ import (
 	"Perseus/server"
 	"log"
 	"net/http"
+
+	"github.com/stripe/stripe-go/v76"
 )
 
 func main() {
+
+	// Stripe test secret API key.
+	stripe.Key = "sk_test_51OFXw4Lvs8YNyX8smm0SPVJwTaxKg31XcafaF8zTPHzzhuDaGOkjvi374NnUdiHf7JMYowaVQ4nK1Y6ac8rhVsTl00UTn0o3Ty"
+	http.HandleFunc("/create-checkout-session", server.CreateCheckoutSession)
 
 	http.HandleFunc("/login", server.Login)
 	http.HandleFunc("/register", server.Register)
