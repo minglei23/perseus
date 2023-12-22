@@ -138,6 +138,7 @@ type Video struct {
 	Type        int
 	TotalNumber int
 	BaseURL     string
+	Hot         bool
 }
 
 type History struct {
@@ -146,6 +147,7 @@ type History struct {
 	Episode     int
 	TotalNumber int
 	BaseURL     string
+	Hot         bool
 }
 
 func buildVideoList(rows *sql.Rows) ([]Video, error) {
@@ -153,7 +155,7 @@ func buildVideoList(rows *sql.Rows) ([]Video, error) {
 	var videos []Video
 	for rows.Next() {
 		var v Video
-		if err := rows.Scan(&v.ID, &v.Name, &v.Type, &v.TotalNumber, &v.BaseURL); err != nil {
+		if err := rows.Scan(&v.ID, &v.Name, &v.Type, &v.TotalNumber, &v.BaseURL, &v.Hot); err != nil {
 			return nil, err
 		}
 		videos = append(videos, v)
@@ -169,7 +171,7 @@ func buildHostoryList(rows *sql.Rows) ([]History, error) {
 	var histories []History
 	for rows.Next() {
 		var v History
-		if err := rows.Scan(&v.ID, &v.Name, &v.Episode, &v.TotalNumber, &v.BaseURL); err != nil {
+		if err := rows.Scan(&v.ID, &v.Name, &v.Episode, &v.TotalNumber, &v.BaseURL, &v.Hot); err != nil {
 			return nil, err
 		}
 		histories = append(histories, v)
@@ -181,7 +183,7 @@ func buildHostoryList(rows *sql.Rows) ([]History, error) {
 }
 
 func GetVideoList() ([]Video, error) {
-	rows, err := db.Query("SELECT id, name, type, total_number, base_url FROM video_info")
+	rows, err := db.Query("SELECT id, name, type, total_number, base_url, hot FROM video_info")
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +191,7 @@ func GetVideoList() ([]Video, error) {
 }
 
 func GetUserLike(userId int) ([]Video, error) {
-	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ? ORDER BY user_like.watch_time DESC", userId)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, video_info.type, video_info.total_number, video_info.base_url, video_info.hot FROM user_like INNER JOIN video_info ON user_like.video_id = video_info.id WHERE user_like.user_id = ? ORDER BY user_like.watch_time DESC", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +200,7 @@ func GetUserLike(userId int) ([]Video, error) {
 
 func GetUserHistoryLstMonth(userId int) ([]History, error) {
 	after := time.Now().AddDate(0, -1, 0)
-	rows, err := db.Query("SELECT video_info.id, video_info.name, user_history.episode, video_info.total_number, video_info.base_url FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ? ORDER BY user_history.watch_time DESC", userId, after)
+	rows, err := db.Query("SELECT video_info.id, video_info.name, user_history.episode, video_info.total_number, video_info.base_url, video_info.hot FROM user_history INNER JOIN video_info ON user_history.video_id = video_info.id WHERE user_history.user_id = ? AND user_history.watch_time > ? ORDER BY user_history.watch_time DESC", userId, after)
 	if err != nil {
 		return nil, err
 	}
