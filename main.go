@@ -5,9 +5,7 @@ import (
 	"Perseus/store"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/plutov/paypal"
 	"github.com/stripe/stripe-go/v76"
 )
 
@@ -17,12 +15,7 @@ func main() {
 	http.HandleFunc("/create-stripe-payment", server.CreateStripePayment)
 	http.HandleFunc("/stripe-webhook", server.StripeWebhook)
 
-	paypalClient, err := paypal.NewClient(store.PayPalClientID, store.PayPalSecret, paypal.APIBaseSandBox)
-	if err != nil {
-		log.Fatalf("Error creating PayPal client: %v", err)
-	}
-	paypalClient.SetLog(os.Stdout)
-	http.HandleFunc("/create-paypal-payment", server.CreatePayPalPayment)
+	http.HandleFunc("/paypal-webhook", server.PayPalWebhook)
 
 	http.HandleFunc("/login", server.Login)
 	http.HandleFunc("/register", server.Register)
@@ -51,7 +44,7 @@ func main() {
 
 	http.HandleFunc("/upload-video-info", server.UploadVideoInfo)
 
-	err = http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

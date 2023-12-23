@@ -3,34 +3,48 @@ package server
 import (
 	"Perseus/store"
 	"encoding/json"
+	"log"
 	"net/http"
-
-	"github.com/stripe/stripe-go/v76"
-	"github.com/stripe/stripe-go/v76/checkout/session"
 )
 
-func CreatePayPalPayment(w http.ResponseWriter, r *http.Request) {
-	params := &stripe.CheckoutSessionParams{
-		PaymentMethodTypes: stripe.StringSlice([]string{
-			"card",
-		}),
-		LineItems: []*stripe.CheckoutSessionLineItemParams{
-			{
-				Price:    stripe.String("price_1OOmU5Lvs8YNyX8sfM3cGoID"),
-				Quantity: stripe.Int64(1),
-			},
-		},
-		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("http://18.188.120.153/profile"),
-		CancelURL:  stripe.String("http://18.188.120.153/profile"),
-	}
-	s, err := session.New(params)
+type SaleResource struct {
+	CustomID int `json:"custom_id"`
+}
+
+type PayPalWebhookEvent struct {
+	ID           string       `json:"id"`
+	CreateTime   string       `json:"create_time"`
+	ResourceType string       `json:"resource_type"`
+	EventType    string       `json:"event_type"`
+	Summary      string       `json:"summary"`
+	Resource     SaleResource `json:"resource"`
+}
+
+func PayPalWebhook(w http.ResponseWriter, r *http.Request) {
+	var notification PayPalWebhookEvent
+	err := json.NewDecoder(r.Body).Decode(&notification)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error decoding webhook request: %v\n", err)
+		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-
-	store.SetCORS(&w)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"sessionId": s.ID})
+	if store.VerifyPayPal(r.Header) {
+		log.Println("Invalid webhook signature")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	userID := notification.Resource.CustomID
+	points, err := store.GetPoints(userID)
+	if err != nil {
+		log.Printf("PayPalWebhook: GetPoints error: %v\n", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	points += 120
+	if err := store.UpdateUserPoints(userID, points); err != nil {
+		log.Printf("PayPalWebhook: UpdateUserPoints error: %v\n", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

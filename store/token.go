@@ -3,10 +3,15 @@ package store
 import (
 	"crypto/sha256"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
+
+func VerifyPayPal(http.Header) bool {
+	return true
+}
 
 func CreateToken(id string) string {
 	expires := time.Now().Add(24 * time.Hour)
