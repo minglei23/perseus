@@ -79,6 +79,12 @@ Check if already checked in today.
 `/checkin`  
 Check in and add points.  
 
+### Episodes API
+`/unlock-episode`  
+Use points to unlock episode.  
+`/episodes`  
+Get user's unlocked episodes.  
+
 ### Admin API
 `/upload-video-info`  
 Upload video info for admin.  
@@ -120,6 +126,22 @@ watch_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY (user_id) REFERENCES user_info(id),
 FOREIGN KEY (video_id) REFERENCES video_info(id)
 );
+```
+
+`user_episode`
+```
+CREATE TABLE user_episode (
+user_id INT UNSIGNED NOT NULL,
+video_id INT UNSIGNED NOT NULL,
+episode INT UNSIGNED NOT NULL,
+watch_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (user_id) REFERENCES user_info(id),
+FOREIGN KEY (video_id) REFERENCES video_info(id)
+);
+
+CREATE INDEX idx_user_id ON user_episode(user_id);
+CREATE INDEX idx_user_video_episode ON user_episode(user_id, video_id, episode);
+
 ```
 
 `user_like`

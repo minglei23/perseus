@@ -87,6 +87,28 @@ host = 'http://127.0.0.1:8080'
 # r = requests.post(checkin_url, json=checkin_data)
 # print(r.text)
 
+# Episodes API
+
+# episodes_url = host + '/episodes'
+# episodes_data = {
+#     'Token':'1|1703389604|a5e6df9347234579865b33895f089645',
+#     'UserID':1,
+# }
+
+# r = requests.post(episodes_url, json=episodes_data)
+# print(r.text)
+
+# unlock_episode_url = host + '/unlock-episode'
+# unlock_episode_data = {
+#     'Token':'1|1703389604|a5e6df9347234579865b33895f089645',
+#     'UserID':1,
+#     'VideoID':1,
+#     'Episode':8,
+# }
+
+# r = requests.post(unlock_episode_url, json=unlock_episode_data)
+# print(r.text)
+
 # Admin API
 
 # upload_url = host + '/upload-video-info'

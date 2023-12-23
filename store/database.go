@@ -22,6 +22,59 @@ func init() {
 	db.SetMaxIdleConns(5)
 }
 
+// EPISODES API
+
+type UserVideoEpisode struct {
+	VideoID int
+	Episode []int
+}
+
+func UserEpisodeExist(userId int, videoId int, episode int) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM user_episode WHERE user_id = ? AND video_id = ? AND episode = ?)"
+	err := db.QueryRow(query, userId, videoId, episode).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+func buildUserEpisodeList(rows *sql.Rows) ([]UserVideoEpisode, error) {
+	defer rows.Close()
+	episodesMap := make(map[int][]int)
+	for rows.Next() {
+		var videoID int
+		var episode int
+		err := rows.Scan(&videoID, &episode)
+		if err != nil {
+			return nil, err
+		}
+		episodesMap[videoID] = append(episodesMap[videoID], episode)
+	}
+	var episodes []UserVideoEpisode
+	for videoID, eps := range episodesMap {
+		episodes = append(episodes, UserVideoEpisode{
+			VideoID: videoID,
+			Episode: eps,
+		})
+	}
+	return episodes, nil
+}
+
+func GetUserEpisodeList(userId int) ([]UserVideoEpisode, error) {
+	query := `SELECT video_id, episode FROM user_episode WHERE user_id = ? ORDER BY video_id, episode`
+	rows, err := db.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	return buildUserEpisodeList(rows)
+}
+
+func InsertUserEpisode(userId int, videoId int, episode int) error {
+	_, err := db.Exec("INSERT INTO user_episode (user_id, video_id, episode) VALUES (?, ?, ?)", userId, videoId, episode)
+	return err
+}
+
 // POINTS API
 
 func GetPoints(id int) (points int, err error) {

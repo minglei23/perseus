@@ -36,6 +36,9 @@ func main() {
 	http.HandleFunc("/already-checkin", server.AlreadyCheckin)
 	http.HandleFunc("/checkin", server.Checkin)
 
+	http.HandleFunc("/unlock-episode", server.UnlockEpisode)
+	http.HandleFunc("/episodes", server.Episodes)
+
 	http.HandleFunc("/upload-video-info", server.UploadVideoInfo)
 
 	err := http.ListenAndServe(":8080", nil)
