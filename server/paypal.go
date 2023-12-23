@@ -9,7 +9,7 @@ import (
 	"github.com/stripe/stripe-go/v76/checkout/session"
 )
 
-func CreateStripePayment(w http.ResponseWriter, r *http.Request) {
+func CreatePayPalPayment(w http.ResponseWriter, r *http.Request) {
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",

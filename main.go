@@ -2,17 +2,26 @@ package main
 
 import (
 	"Perseus/server"
+	"Perseus/store"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/plutov/paypal"
 	"github.com/stripe/stripe-go/v76"
 )
 
 func main() {
 
-	// Stripe test secret API key.
-	stripe.Key = "sk_test_51OFXw4Lvs8YNyX8smm0SPVJwTaxKg31XcafaF8zTPHzzhuDaGOkjvi374NnUdiHf7JMYowaVQ4nK1Y6ac8rhVsTl00UTn0o3Ty"
-	http.HandleFunc("/create-checkout-session", server.CreateCheckoutSession)
+	stripe.Key = store.StripeKey
+	http.HandleFunc("/create-stripe-payment", server.CreateStripePayment)
+
+	paypalClient, err := paypal.NewClient(store.PayPalClientID, store.PayPalSecret, paypal.APIBaseSandBox)
+	if err != nil {
+		log.Fatalf("Error creating PayPal client: %v", err)
+	}
+	paypalClient.SetLog(os.Stdout)
+	http.HandleFunc("/create-paypal-payment", server.CreatePayPalPayment)
 
 	http.HandleFunc("/login", server.Login)
 	http.HandleFunc("/register", server.Register)
@@ -41,7 +50,7 @@ func main() {
 
 	http.HandleFunc("/upload-video-info", server.UploadVideoInfo)
 
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
