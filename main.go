@@ -15,6 +15,7 @@ func main() {
 
 	stripe.Key = store.StripeKey
 	http.HandleFunc("/create-stripe-payment", server.CreateStripePayment)
+	http.HandleFunc("/stripe-webhook", server.StripeWebhook)
 
 	paypalClient, err := paypal.NewClient(store.PayPalClientID, store.PayPalSecret, paypal.APIBaseSandBox)
 	if err != nil {
