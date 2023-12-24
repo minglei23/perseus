@@ -127,3 +127,15 @@ host = 'http://127.0.0.1:8080'
 
 # r = requests.get(video_url)
 # print(r.text)
+
+# stripe_url = host + '/create-stripe-payment'
+# stripe_data = {
+# 	'ID':1,
+# 	'Amount':100,
+# 	'ProductID':'price_1OQqxYLvs8YNyX8sRMRaBbcN',
+# 	'SuccessURL':'http://localhost:3000/',
+# 	'CancelURL':'http://localhost:3000/',
+# }
+
+# r = requests.post(stripe_url, json=stripe_data)
+# print(r.text)

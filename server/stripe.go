@@ -15,6 +15,7 @@ import (
 
 type StripeRequest struct {
 	ID         int
+	Amount     int64
 	ProductID  string
 	SuccessURL string
 	CancelURL  string
@@ -39,7 +40,7 @@ func CreateStripePayment(w http.ResponseWriter, r *http.Request) {
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Price:    stripe.String(request.ProductID),
-				Quantity: stripe.Int64(1),
+				Quantity: stripe.Int64(request.Amount),
 			},
 		},
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
