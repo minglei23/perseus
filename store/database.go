@@ -123,7 +123,7 @@ func InsertVideo(name string, videoType int, totalNumber int, baseUrl string) (i
 // LOGIN API
 
 func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip bool, err error) {
-	query := "SELECT id, activated, vip FROM user_info WHERE email = ? AND password = ?"
+	query := "SELECT id, activated, vip FROM user_info WHERE email = ? AND password = ? AND type = 0"
 	err = db.QueryRow(query, email, password).Scan(&id, &activated, &vip)
 	if err == sql.ErrNoRows {
 		// email or password is not correct
@@ -136,7 +136,7 @@ func GetUserIdByEmailAndPassword(email, password string) (id int, activated, vip
 
 func EmailExist(email string) (bool, error) {
 	var id int
-	query := "SELECT id FROM user_info WHERE email = ?"
+	query := "SELECT id FROM user_info WHERE email = ? AND type = 0"
 	err := db.QueryRow(query, email).Scan(&id)
 	if err == sql.ErrNoRows {
 		return false, nil
@@ -147,6 +147,30 @@ func EmailExist(email string) (bool, error) {
 func InsertUser(password, email string) (id int, err error) {
 	query := "INSERT INTO user_info (password, email, activated, vip, points) values (?, ?, FALSE, FALSE, 0)"
 	result, err := db.Exec(query, password, email)
+	if err != nil {
+		return id, err
+	}
+	ID, err := result.LastInsertId()
+	if err != nil {
+		return id, err
+	}
+	return int(ID), nil
+}
+
+// COLOGIN API
+
+func GetUserIdByIdAndType(coId string, coType int) (id int, activated, vip bool, err error) {
+	query := "SELECT id, activated, vip FROM user_info WHERE password = ? AND type = ?"
+	err = db.QueryRow(query, coId, coType).Scan(&id, &activated, &vip)
+	if err == sql.ErrNoRows {
+		return -1, false, false, nil
+	}
+	return id, activated, vip, err
+}
+
+func InsertCoUser(coId, email string, coType int) (id int, err error) {
+	query := "INSERT INTO user_info (password, email, activated, vip, points, type) values (?, ?, FALSE, FALSE, 0, ?)"
+	result, err := db.Exec(query, coId, email, coType)
 	if err != nil {
 		return id, err
 	}

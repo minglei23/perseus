@@ -139,3 +139,16 @@ host = 'http://127.0.0.1:8080'
 
 # r = requests.post(stripe_url, json=stripe_data)
 # print(r.text)
+
+# COLOGIN API
+
+# cologin_url = host + '/co-login'
+# cologin_data = {
+#     'id':'facebook123456',
+#     'token':'test123456',
+#     'type':2,
+#     'email':'barry li',
+# }
+
+# r = requests.post(cologin_url, json=cologin_data)
+# print(r.text)
