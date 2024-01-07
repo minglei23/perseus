@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type SaleResource struct {
-	CustomID int `json:"custom_id"`
+	CustomID int    `json:"custom_id"`
+	Amount   string `json:"amount"`
 }
 
 type PayPalWebhookEvent struct {
@@ -28,23 +30,47 @@ func PayPalWebhook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	if store.VerifyPayPal(r.Header) {
+	if !store.VerifyPayPal(r.Header) {
 		log.Println("Invalid webhook signature")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+
+	log.Printf("Received PayPal webhook notification: %+v\n", notification)
 	userID := notification.Resource.CustomID
+	log.Printf("CustomID: %d\n", notification.Resource.CustomID)
+	log.Printf("Amount: %s\n", notification.Resource.Amount)
+
+	amount, err := strconv.ParseFloat(notification.Resource.Amount, 64)
+	if err != nil {
+		log.Printf("Error parsing amount: %v\n", err)
+		http.Error(w, "Error processing payment amount", http.StatusInternalServerError)
+		return
+	}
+
+	basicPoints := int64(amount * 50)
+	var bonus float64 = 1.1
+	if basicPoints >= 1500 {
+		bonus = 1.5
+	} else if basicPoints >= 1000 {
+		bonus = 1.3
+	} else if basicPoints >= 250 {
+		bonus = 1.2
+	}
+	additionalPoints := int(float64(basicPoints) * bonus)
+
 	points, err := store.GetPoints(userID)
 	if err != nil {
 		log.Printf("PayPalWebhook: GetPoints error: %v\n", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	points += 120
+	points += additionalPoints
 	if err := store.UpdateUserPoints(userID, points); err != nil {
 		log.Printf("PayPalWebhook: UpdateUserPoints error: %v\n", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 }

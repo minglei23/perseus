@@ -100,13 +100,25 @@ func StripeWebhook(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		additionalPoints := int(session.AmountTotal / 2)
+		var bonus float64 = 1.1
+		if additionalPoints >= 1500 {
+			bonus = 1.5
+		} else if additionalPoints >= 1000 {
+			bonus = 1.3
+		} else if additionalPoints >= 250 {
+			bonus = 1.2
+		}
+		additionalPoints = int(float64(additionalPoints) * bonus)
+		log.Printf("User %s buy points %d\n", userIDStr, additionalPoints)
+
 		points, err := store.GetPoints(userID)
 		if err != nil {
 			log.Printf("StripeWebhook: GetPoints error: %v\n", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		points += 120
+		points += additionalPoints
 		if err := store.UpdateUserPoints(userID, points); err != nil {
 			log.Printf("StripeWebhook: UpdateUserPoints error: %v\n", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
