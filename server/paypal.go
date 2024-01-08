@@ -8,9 +8,14 @@ import (
 	"strconv"
 )
 
+type AmountDetail struct {
+	Total    string `json:"total"`
+	Currency string `json:"currency"`
+}
+
 type SaleResource struct {
-	CustomID int    `json:"custom_id"`
-	Amount   string `json:"amount"`
+	CustomID int          `json:"custom_id"`
+	Amount   AmountDetail `json:"amount"`
 }
 
 type PayPalWebhookEvent struct {
@@ -38,10 +43,11 @@ func PayPalWebhook(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Received PayPal webhook notification: %+v\n", notification)
 	userID := notification.Resource.CustomID
-	log.Printf("CustomID: %d\n", notification.Resource.CustomID)
-	log.Printf("Amount: %s\n", notification.Resource.Amount)
+	log.Printf("CustomID: %d\n", userID)
+	log.Printf("Amount: %s\n", notification.Resource.Amount.Total)
+	log.Printf("Currency: %s\n", notification.Resource.Amount.Currency)
 
-	amount, err := strconv.ParseFloat(notification.Resource.Amount, 64)
+	amount, err := strconv.ParseFloat(notification.Resource.Amount.Total, 64)
 	if err != nil {
 		log.Printf("Error parsing amount: %v\n", err)
 		http.Error(w, "Error processing payment amount", http.StatusInternalServerError)

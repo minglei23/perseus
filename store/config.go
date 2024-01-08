@@ -12,6 +12,6 @@ const (
 	StripeKey     = "sk_test_51OFXw4Lvs8YNyX8smm0SPVJwTaxKg31XcafaF8zTPHzzhuDaGOkjvi374NnUdiHf7JMYowaVQ4nK1Y6ac8rhVsTl00UTn0o3Ty"
 	StripeWebhook = "we_1OW6PXLvs8YNyX8siEVZQaS9"
 
-	PayPalClientID = "Abo6knU842QjT-gTg-78UGN6jMVmg0Hq8EoF_z6NmNhdl7L7GstsmR_DJGWrHosjnYkiqq_Lb6DOP7PM"
-	PayPalSecret   = "EINltfCmahqE0HghbfXj7rrVCYtkchynqjqh8hLASJd4Q0Nr4CSy3xUKvRV3gMRe4b1mj4Sj456gETqZ"
+	PayPalClientID = "AUJ5F-KGPcYsulvUVFB7urAUOH0e2-eX-hc8VhQElRk3Pgsy3WBhnqYAAsfXuEF0CGUfWqISJ6Vjc64v"
+	PayPalSecret   = "EKo8ek7lA2LvB_hEZjU5pHzAVR_QmPmMwPDkcR2Akc_CqrVVsRcO8rCIWHez1DjCFOY8hB3Nr6uY7Vae"
 )
