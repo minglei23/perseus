@@ -85,7 +85,7 @@ func StripeWebhook(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error processing checkout session", http.StatusInternalServerError)
 			return
 		}
-		log.Panicln("Stripe Webhook:", session)
+		log.Printf("Stripe Webhook: %+v\n", session)
 
 		userIDStr, ok := session.Metadata["userID"]
 		if !ok {
