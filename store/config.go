@@ -9,7 +9,7 @@ const (
 	MysqlPassword = "Perseus_1110_Database_2023"
 	MysqlDB       = "v0"
 
-	StripeKey     = "sk_test_51OFXw4Lvs8YNyX8smm0SPVJwTaxKg31XcafaF8zTPHzzhuDaGOkjvi374NnUdiHf7JMYowaVQ4nK1Y6ac8rhVsTl00UTn0o3Ty"
+	StripeKey     = "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"
 	StripeWebhook = "we_1OW6PXLvs8YNyX8siEVZQaS9"
 
 	PayPalClientID = "AUJ5F-KGPcYsulvUVFB7urAUOH0e2-eX-hc8VhQElRk3Pgsy3WBhnqYAAsfXuEF0CGUfWqISJ6Vjc64v"
