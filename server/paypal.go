@@ -9,12 +9,12 @@ import (
 )
 
 type AmountDetail struct {
-	Total    string `json:"total"`
-	Currency string `json:"currency"`
+	Value        string `json:"value"`
+	CurrencyCode string `json:"currency_code"`
 }
 
 type SaleResource struct {
-	CustomID int          `json:"custom_id"`
+	CustomID string       `json:"custom_id"`
 	Amount   AmountDetail `json:"amount"`
 }
 
@@ -42,12 +42,18 @@ func PayPalWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Received PayPal webhook notification: %+v\n", notification)
-	userID := notification.Resource.CustomID
-	log.Printf("CustomID: %d\n", userID)
-	log.Printf("Amount: %s\n", notification.Resource.Amount.Total)
-	log.Printf("Currency: %s\n", notification.Resource.Amount.Currency)
+	userID, err := strconv.Atoi(notification.Resource.CustomID)
+	if err != nil {
+		log.Printf("Error converting userID (%s) to int: %v\n", notification.Resource.CustomID, err)
+		http.Error(w, "Error processing metadata", http.StatusInternalServerError)
+		return
+	}
 
-	amount, err := strconv.ParseFloat(notification.Resource.Amount.Total, 64)
+	log.Printf("CustomID: %d\n", userID)
+	log.Printf("Amount: %s\n", notification.Resource.Amount.Value)
+	log.Printf("Currency: %s\n", notification.Resource.Amount.CurrencyCode)
+
+	amount, err := strconv.ParseFloat(notification.Resource.Amount.Value, 64)
 	if err != nil {
 		log.Printf("Error parsing amount: %v\n", err)
 		http.Error(w, "Error processing payment amount", http.StatusInternalServerError)
